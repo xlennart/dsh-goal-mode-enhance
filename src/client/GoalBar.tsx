@@ -250,7 +250,7 @@ export function GoalBar({ goal, roundsStarted, onCreate, onEdit, onPause, onResu
         onCreate={async (objective, maxGoalRounds) => {
           const result = await runAction(() => onCreate(objective, maxGoalRounds))
           if (result?.ok) setMode(null)
-          return result ?? { ok: false, error: { code: 'busy', message: 'previous operation still running', details: {} } }
+          return result ?? { ok: false, error: { code: 'busy', message: 'previous operation still running' } }
         }}
         onCancel={() => { setMode(null) }}
         pending={pending}

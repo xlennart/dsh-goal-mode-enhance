@@ -1,11 +1,11 @@
 /** Settings page section for the goal mode: the current goal and guidance. */
 
-import type { SessionListState } from '@deepseek-ai/dsh-client-runtime/client'
+import type { SessionListState, SessionSummary } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { HostObservable, InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { GoalProjection } from '@deepseek-ai/dsh-goal/client'
 import type { GoalModeKey } from './locales.ts'
 
-/** Injected root-level session list used to resolve the currently selected session's goal. */
+/** Injected root-level session list used to resolve the main-view session's goal. */
 export interface GoalSettingsSectionInjected {
   hooks: { sessions: HostObservable<SessionListState> }
 }
@@ -27,6 +27,16 @@ const PHASE_LABELS = {
 /** Keep the settings overview compact even when the Goal is a long specification. */
 const OBJECTIVE_PREVIEW_LIMIT = 320
 
+/**
+ * The session the section reports on: the one currently retained by the
+ * main view (the workspace browser derives the same selection this way).
+ * @param sessions - the root-level session list snapshot.
+ * @returns the main-view session summary, or undefined while none is retained.
+ */
+function mainViewSession(sessions: SessionListState): SessionSummary | undefined {
+  return Object.values(sessions.byId).find(session => (session.retainedBy.mainView ?? 0) > 0)
+}
+
 /** Collapse paragraph breaks and repeated spacing for the overview card. */
 function objectivePreview(objective: string): { text: string; hasMore: boolean } {
   const normalized = objective.replace(/\s+/gu, ' ').trim()
@@ -42,15 +52,16 @@ function roundsText(goal: { roundsStarted?: number; maxGoalRounds?: number }, t:
 }
 
 /**
- * Render the goal-mode settings page: the current goal card plus guidance.
+ * Render the goal-mode settings page: the main-view session's goal card plus guidance.
  * @param props - composed Settings slot props.
  * @returns the section body.
  */
 export function GoalSettingsSection({ useSessions, t }: GoalSettingsSectionProps) {
   const sessions = useSessions(snapshot => snapshot)
-  const projection = sessions.current === undefined
+  const summary = mainViewSession(sessions)
+  const projection = summary === undefined
     ? undefined
-    : sessions.byId[sessions.current]?.projectionValues?.goal as GoalProjection | null | undefined
+    : summary.projectionValues?.goal as GoalProjection | null | undefined
   const goal = projection === undefined || projection === null ? null : projection.goal
   const roundsStarted = projection === undefined || projection === null ? 0 : projection.roundsStarted
   const preview = goal === null ? null : objectivePreview(goal.objective)

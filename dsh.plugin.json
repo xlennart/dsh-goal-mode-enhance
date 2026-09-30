@@ -1,7 +1,7 @@
 {
   "name": "dsh-goal-mode",
   "description": "Enhanced goal surface for the DeepSeek Harness web UI: full lifecycle dock above the composer, composer tool-row entry, collapsible chip, and a General-settings visibility switch.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "entry": {
     "name": "dsh-goal-mode",
     "inject": []

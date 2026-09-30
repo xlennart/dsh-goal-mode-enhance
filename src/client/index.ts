@@ -7,23 +7,29 @@
  * projection; mutation verbs route through the generated `remote.goals`
  * namespace (mounted by the web assembly's api-remotes), reading the CAS ref
  * from the session's current projected value at call time. The composer
- * entry's visibility is a Host-backed preference mirrored by a policy over
- * the settings scope. Viewing state (expanded/collapsed) is page-local and
- * shared through the `view` hook.
+ * entry's visibility is a Host-backed preference mirrored from the
+ * `ui-goal-mode` configuration form. Viewing state (expanded/collapsed) is
+ * page-local and shared through the `view` hook.
  */
 
-import type { ClientContext, SessionId } from '@deepseek-ai/dsh-client-runtime/client'
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 // Type-only: the ctx.remote merge (the generated Remote namespaces).
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 // Type-only: the ctx.locale Context merge.
 import type {} from '@deepseek-ai/dsh-client-locale/client'
-// Type-only: the ctx.settingsScope Context merge.
+// Type-only: the ctx.configForms Context merge and the settings slot map.
 import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
-// Type-only: the conversation SlotMap entries (input.dock / input.left) and
-// the ui-settings General row entry.
+// Type-only: the conversation SlotMap entries (input.dock / input.left).
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
+// Type-only: the ctx.slots SlotRegistry service merge.
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 // Type-only: the `goal` SessionProjectionMap key merge.
 import type { GoalProjection, GoalRef } from '@deepseek-ai/dsh-goal/client'
+import {
+  GOAL_MODE_SETTINGS_NAMESPACE,
+  type GoalModeSettings,
+} from '../settings-contract.ts'
 import type { GoalModeActionResult, GoalModeActions } from './slots.ts'
 import { ComposerEntryRow, type ComposerEntryRowInjected } from './ComposerEntryRow.tsx'
 import { GoalSettingsSection, type GoalSettingsSectionInjected } from './GoalSettingsSection.tsx'
@@ -34,7 +40,7 @@ import { en, NS, zh } from './locales.ts'
 import { cssText, STYLE_ID } from './styles.ts'
 
 /** Required services for the dock, composer entry, settings row, Remote mutations, preferences, and copy. */
-export const inject = ['slots', 'sessions', 'remote', 'remote.goals', 'locale', 'settingsScope']
+export const inject = ['slots', 'sessions', 'remote', 'remote.goals', 'locale', 'configForms']
 
 /** The goal-mode viewing store handle: expanded/collapsed, shared by dock and composer entry. */
 export function createGoalModeStore(): GoalModeViewHandle {
@@ -83,7 +89,7 @@ export function apply(ctx: ClientContext): void {
 
   const noCurrentGoal: GoalModeActionResult = {
     ok: false,
-    error: { code: 'no-current-goal', message: 'no current goal to mutate', details: {} },
+    error: { code: 'no-current-goal', message: 'no current goal to mutate' },
   }
 
   // One viewing store shared by the dock strip and the composer entry, so
@@ -92,9 +98,9 @@ export function apply(ctx: ClientContext): void {
   const goalModeView = createGoalModeStore()
 
   // One preference policy shared by the Settings row and the composer entry,
-  // mirroring the Host-backed durable section.
+  // mirroring the durable Host-backed form.
   const settingsPolicy = new GoalModeSettingsPolicy(
-    ctx.settingsScope.bind<{ composerEntryVisible: boolean }>({ namespace: 'ui-goal-mode' }),
+    ctx.configForms.get<GoalModeSettings>(GOAL_MODE_SETTINGS_NAMESPACE),
   )
 
   ctx.slots.inject('conversation.input.dock', () => ctx.slots.register({

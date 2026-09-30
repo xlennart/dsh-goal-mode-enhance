@@ -1,12 +1,11 @@
 /**
  * Goal-mode preferences policy. It owns the live composer-entry visibility
- * preference and mirrors the durable Host section; the Settings row and the
- * composer entry share this one instance.
+ * preference and mirrors the durable `ui-goal-mode` configuration form; the
+ * Settings row and the composer entry share this one instance.
  */
 
-import {
-  createSnapshotStore, type SettingsScope, type SnapshotStore,
-} from '@deepseek-ai/dsh-client-runtime/client'
+import { createSnapshotStore, type SnapshotStore } from '@deepseek-ai/dsh-client-store'
+import type { ConfigForm } from '@deepseek-ai/dsh-client-ui-settings/client'
 import {
   COMPOSER_ENTRY_FIELD,
   DEFAULT_COMPOSER_ENTRY_VISIBLE,
@@ -21,19 +20,24 @@ import {
 export class GoalModeSettingsPolicy {
   /** Reactive visibility source for the Settings row and the composer entry. */
   readonly composerEntryVisible: SnapshotStore<boolean> = createSnapshotStore(DEFAULT_COMPOSER_ENTRY_VISIBLE)
-  private readonly host: SettingsScope<GoalModeSettings> | undefined
+  private readonly host: ConfigForm<GoalModeSettings> | undefined
 
   /**
-   * @param host - durable preference scope owned by the providing plugin;
+   * @param host - durable configuration form owned by the providing plugin;
    * absent compositions stay process-local. The adoption subscription shares
-   * the scope's plugin lifetime — a disposed scope never publishes again, so
+   * the form's plugin lifetime — a disposed form never publishes again, so
    * the policy needs no release hook.
    */
-  constructor(host?: SettingsScope<GoalModeSettings>) {
+  constructor(host?: ConfigForm<GoalModeSettings>) {
     this.host = host
     if (host !== undefined) {
-      host.subscribe(() => { this.adopt(host) })
-      this.adopt(host)
+      const adopt = (): void => {
+        const section = host.getSnapshot().value
+        if (section === undefined || this.composerEntryVisible.getSnapshot() === section.composerEntryVisible) return
+        this.composerEntryVisible.set(section.composerEntryVisible)
+      }
+      host.subscribe(adopt)
+      adopt()
     }
   }
 
@@ -46,15 +50,5 @@ export class GoalModeSettingsPolicy {
     if (this.composerEntryVisible.getSnapshot() === visible) return
     this.composerEntryVisible.set(visible)
     void this.host?.set(COMPOSER_ENTRY_FIELD, visible)
-  }
-
-  /**
-   * Adopt the scope's accepted durable value without writing it back.
-   * @param host - the constructor-narrowed scope driving this adoption.
-   */
-  private adopt(host: SettingsScope<GoalModeSettings>): void {
-    const section = host.getSnapshot().value
-    if (section === undefined || this.composerEntryVisible.getSnapshot() === section.composerEntryVisible) return
-    this.composerEntryVisible.set(section.composerEntryVisible)
   }
 }

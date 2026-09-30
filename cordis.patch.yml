@@ -1,5 +1,7 @@
 # dsh-goal-mode bundle patch: mount the host plugin under its package name,
-# resolved through the profile's node_modules.
+# resolved through the profile's node_modules. The entry id doubles as the
+# `ui-goal-mode` settings namespace, so the 0.1.1 durable section of the same
+# name migrates into this entry's config override.
 - insert:
-    - id: dsh-goal-mode
+    - id: ui-goal-mode
       name: dsh-goal-mode

@@ -2,12 +2,13 @@
  * Single-file client + ESM host build for dsh-goal-mode.
  *
  * The web server serves exactly one file per plugin
- * (/plugins/dsh-goal-mode/client.js), so the client half is one CJS bundle
- * wrapped in the ModuleLoader factory handshake; @deepseek-ai/dsh-* and react
- * stay external (the profile's healed node_modules and the app's module
- * system provide them). The host half is plain ESM for Node, externalizing
- * @deepseek-ai/dsh-* plus cordis while bundling schemastery (the Loader
- * validates Config against the schema).
+ * (/plugins/ui-goal-mode/client.js — the module id in the banner stays the
+ * package name), so the client half is one CJS bundle wrapped in the
+ * ModuleLoader factory handshake; @deepseek-ai/dsh-* and react stay external
+ * (the profile's healed node_modules and the app's module system provide
+ * them). The host half is plain ESM for Node, externalizing @deepseek-ai/dsh-*
+ * and cordis while bundling schemastery (the Loader validates Config against
+ * the schema).
  */
 import { build } from 'esbuild'
 import { mkdirSync, readFileSync } from 'node:fs'
@@ -19,18 +20,6 @@ const dshExternal = ['@deepseek-ai/cordis', '@deepseek-ai/dsh-*']
 await build({
   entryPoints: ['src/index.ts'],
   outfile: 'lib/index.js',
-  bundle: true,
-  format: 'esm',
-  platform: 'node',
-  target: ['node22'],
-  sourcemap: true,
-  external: dshExternal,
-  logLevel: 'info',
-})
-
-await build({
-  entryPoints: ['src/invariant.ts'],
-  outfile: 'lib/invariant.js',
   bundle: true,
   format: 'esm',
   platform: 'node',

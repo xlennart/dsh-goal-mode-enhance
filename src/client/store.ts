@@ -6,7 +6,7 @@
  * preference.
  */
 
-import { createSnapshotStore, type SnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
+import { createSnapshotStore, type SnapshotStore } from '@deepseek-ai/dsh-client-store'
 
 /** Viewing state of the goal-mode surface. */
 export interface GoalModeViewState {
