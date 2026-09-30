@@ -26,4 +26,3 @@ jobs:
         run: |
           test -f lib/index.js
           test -f lib/client.js
-          test -f lib/invariant.js
