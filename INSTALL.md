@@ -10,28 +10,26 @@
 
 ```sh
 # 1. 从 Release 下载 tarball（最新或固定版本）：
-#    https://github.com/KarlOfLaw/dsh-goal-mode-enhance/releases/latest/download/dsh-goal-mode-0.2.0.tgz
+#    https://github.com/xlennart/dsh-goal-mode-enhance/releases/latest/download/dsh-goal-mode-0.2.1.tgz
 
 # 2. 装进 web profile（指向下载的 tgz 文件）
-dsh plugin --profile web add E:\downloads\dsh-goal-mode-0.2.0.tgz
+dsh plugin --profile web add E:\downloads\dsh-goal-mode-0.2.1.tgz
 
 # 3. 重启 DSH Desktop（或重启 dsh web）
 ```
 
-> 说明：插件运行所需的 `@deepseek-ai/dsh-*`（0.2.0-rc.2）不做公共 npm 版本锁定，
-> 且本仓库的开发依赖以 `link:` 指向本地 deepseek-harness 源码克隆做类型解析，因此
-> **从 GitHub 源码直接安装不可用**，预构建 tarball 是规范认可的正式安装路径。运行时
-> 依赖（`@deepseek-ai/*`）全部以 optional peer 声明，由宿主 profile 提供，tarball 内
-> 不含、也不需要它们。
+> 说明：插件运行所需的 `@deepseek-ai/dsh-*`（0.2.2-rc.1 已公开发布）在包内以 optional peer 声明，
+> 由宿主 profile 提供，tarball 内不含、也不需要它们；开发依赖已统一为公开发布版本，**不再**要求
+> 本地 deepseek-harness 源码克隆。兼容性由包自身 `engines.dsh`（`>=0.2.2-rc.1 <0.3.0-0`）判定。
 
 ### 方式 A2：本地构建后安装（开发者）
 
-要求：Node.js + pnpm（插件依赖 deepseek-harness 源码克隆做类型解析，见 `package.json` 的 `link:` devDependencies；需将本仓库放在该克隆的旁侧目录，如 `E:\DSH_Work\dsh-side-chat\output\upstream\deepseek-harness`）。
+要求：Node.js 22+（开发依赖均为公开发布版 `0.2.2-rc.1`，不再需要 deepseek-harness 源码克隆）。
 
 ```sh
 # 1. 安装依赖并构建
-pnpm install
-pnpm run build
+npm install
+npm run build
 
 # 2. 装进 web profile
 dsh plugin --profile web add file:/path/to/dsh-goal-mode

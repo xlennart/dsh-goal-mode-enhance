@@ -24,6 +24,9 @@ import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 // Type-only: the ctx.slots SlotRegistry service merge.
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
+// Type-only: pulls the Session standard `useProjection` / `sessionId` seat and
+// the `mainView` retention label into the slot props and session reference map.
+import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 // Type-only: the `goal` SessionProjectionMap key merge.
 import type { GoalProjection, GoalRef } from '@deepseek-ai/dsh-goal/client'
 import {

@@ -15,20 +15,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      # Same build gate as verify.yml: strip the dev-only `link:` dependencies,
-      # install the two public build tools, bundle with dsh imports external.
-      - name: Build the installable bundle
+      # Same gate as verify.yml: published devDependencies give real host typings,
+      # every `@deepseek-ai/dsh-*` import stays external for the host profile.
+      - name: Install, typecheck, build
         run: |
-          node -e "const f='./package.json',p=require(f);delete p.devDependencies;delete p.scripts;require('fs').writeFileSync(f,JSON.stringify(p,null,2))"
-          npm install --no-save esbuild@^0.25.0 @deepseek-ai/schemastery@^3.18.1
-          node build.mjs
+          npm install --no-audit --no-fund
+          npm run typecheck
+          npm run build
+          node scripts/smoke-client.mjs
       - name: Pack the prebuilt tarball
-        run: npm pack
+        run: |
+          test -f lib/index.js
+          test -f lib/client.js
+          npm pack
       - name: Create the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" \
             --title "dsh-goal-mode $GITHUB_REF_NAME" \
-            --notes "Prebuilt installable tarball (lib/ included, no build needed on your machine). Install: dsh plugin --profile web add <path-to-tgz>, then restart the harness. See COMPATIBILITY.md for the verified DSH version." \
+            --notes "Prebuilt installable tarball (lib/ included, no build needed on your machine). Verified against DSH 0.2.2-rc.1. Install: dsh plugin --profile web add <path-to-tgz>, then restart the harness. See COMPATIBILITY.md for the compatible DSH range." \
             dsh-goal-mode-*.tgz

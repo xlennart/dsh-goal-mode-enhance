@@ -13,16 +13,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      # devDependencies use pnpm `link:` paths that only exist next to a local
-      # deepseek-harness checkout, so CI strips them and installs just the two
-      # packages the bundle step needs — every `@deepseek-ai/dsh-*` import stays
-      # external (declared optional-peer, provided by the host profile).
+      # devDependencies point at published @deepseek-ai/* 0.2.2-rc.1 packages, so a
+      # plain install gives us the real host typings. Every `@deepseek-ai/dsh-*`
+      # import in the bundle stays external (declared optional-peer, provided by
+      # the host profile).
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Typecheck against the target host typings
+        run: npm run typecheck
       - name: Build the installable bundle
-        run: |
-          node -e "const f='./package.json',p=require(f);delete p.devDependencies;delete p.scripts;require('fs').writeFileSync(f,JSON.stringify(p,null,2))"
-          npm install --no-save esbuild@^0.25.0 @deepseek-ai/schemastery@^3.18.1
-          node build.mjs
+        run: npm run build
       - name: Check bundle output
         run: |
           test -f lib/index.js
           test -f lib/client.js
+      - name: Offline smoke of the client bundle
+        run: node scripts/smoke-client.mjs
+      - name: Check the host half loads
+        run: node -e "import('./lib/index.js').then(m=>{if(typeof m.apply!=='function')process.exit(1)})"

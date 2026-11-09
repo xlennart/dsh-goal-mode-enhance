@@ -56,7 +56,7 @@ English | [中文](README.zh.md)
 
 ## 安装
 
-- **形态 A（正式插件）**：推荐直接使用 [Release 预构建 tarball](https://github.com/KarlOfLaw/dsh-goal-mode-enhance/releases/latest/download/dsh-goal-mode-0.2.0.tgz)——`dsh plugin --profile web add <tgz 路径>` 后重启即可；开发者本地构建方式见 [INSTALL.md](./INSTALL.md)。已验证的 DSH 版本兼容性结论见 [COMPATIBILITY.md](./COMPATIBILITY.md)。
+- **形态 A（正式插件）**：推荐直接使用 [Release 预构建 tarball](https://github.com/xlennart/dsh-goal-mode-enhance/releases/latest/download/dsh-goal-mode-0.2.1.tgz)——`dsh plugin --profile web add <tgz 路径>` 后重启即可；开发者本地构建方式见 [INSTALL.md](./INSTALL.md)。已验证的 DSH 版本兼容性结论见 [COMPATIBILITY.md](./COMPATIBILITY.md)。
 - **形态 B（动态插件）**：见 `host.js` / `client.js` 顶部注释，会话内 `cordis_define` + `cordis_run` 加载。
 
 ## 仓库结构
@@ -90,7 +90,7 @@ dsh-goal-mode/
 
 ## 要求
 
-- DeepSeek Harness（Web GUI，`web` profile）`@deepseek-ai/*` **0.2.0-rc.2及以上**（`configForms` 服务；插件 0.1.0 对应 0.1.1-rc.2）
+- DeepSeek Harness（Web GUI，`web` profile）`@deepseek-ai/*` **0.2.2-rc.1及以上**（Session 标准 props 由 `dsh-client-ui-session` 提供，兼容性由 `engines.dsh` 判定；插件 0.2.0 对应 0.2.0-rc.2，0.1.0 对应 0.1.1-rc.2）
 - 目标系统内置（`goals` 服务 + `goal` 投影）
 
 ## License

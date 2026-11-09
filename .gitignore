@@ -1,8 +1,10 @@
 node_modules/
+node_modules.bak-*/
 coverage/
 *.tsbuildinfo
 .DS_Store
 lib/
+.npm-cache/
 
 *.tgz
 debug.log

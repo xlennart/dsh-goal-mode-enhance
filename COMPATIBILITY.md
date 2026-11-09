@@ -10,6 +10,25 @@
 | 宿主 | DSH Desktop 2.0.2（web profile，Windows 11） |
 | 安装形态 | A（`dsh plugin --profile web add`，随宿主启动挂载） |
 
+## 0.2.1 适配（2026-11-09）
+
+插件 0.2.1 适配 `@deepseek-ai/*` **0.2.2-rc.1**（DSH 宿主 0.2.2-rc.1）。相对 0.2.0 的破坏点与修法：
+
+| 破坏点 | 0.2.0-rc.2 的形态 | 0.2.2-rc.1 的形态 | 本插件修法 |
+|---|---|---|---|
+| Session 标准 props 的归属 | 由 slots 包自带（`useProjection`、`sessionId`、`useAccess` 直接可用） | 迁到 `@deepseek-ai/dsh-client-ui-session`，靠该包的声明合并注入 | `import type {} from '@deepseek-ai/dsh-client-ui-session/client'`，并把该包写进 `dsh.client.inject` |
+| `SessionReferenceSourceMap` 基座 | 含 `mainView` 等 UI 来源标签 | 基座只剩 `controllerOperation` / `gateway`；`mainView` 由 ui-session 声明 | 同上一处 type-only 导入即恢复 `retainedBy.mainView` 推导 |
+| 插槽 `inject` 回调参数 | 固定 `SessionId` | `SessionIdOf`（取 `SessionStandardProps.sessionId`，未合并时回落 `string`） | 回调参数不再显式标注品牌类型，避免 TS2769 |
+| 依赖形态 | `devDependencies` 为本地 `link:../dsh-src/...` | 同上，且 `dsh-client-runtime` / `dsh-invariants` / `dsh-client-ui-primitives` 已从发布线移除 | 全部改为公开发布版本 `0.2.2-rc.1`（cordis `^4.1.0`、schemastery `^3.19.0` 走各自版本线） |
+| 兼容性判定来源 | peer `@deepseek-ai/dsh*` 声明 | 包自身 `engines.dsh` 单独决定（存在时 peer 被忽略） | 声明 `"engines": { "dsh": ">=0.2.2-rc.1 <0.3.0-0" }`：接受 0.2.2 及其后的 0.2.x，排除 0.2.2 之前的 rc 与 0.3.0 预发布 |
+
+验证链（本地，2026-11-09）：
+
+1. `npm install`（公开发布版依赖）→ `npx tsc --noEmit` 对 0.2.2-rc.1 类型零错误。
+2. `node build.mjs` → `lib/index.js`（host 半，ESM）、`lib/client.js`（client 半，CJS 工厂 + banner 握手），并拦截 Host-only 依赖泄漏。
+3. `node scripts/smoke-client.mjs` → 复现 `window.__ModuleLoader__.load({ id, factory })` 握手，用 stub client Context 跑插件体，断言 `conversation.input.dock:goal`、`conversation.input.left:goal-mode`、`settings.general.item:goal-mode`、`settings.section:goal-mode` 四处注册与 `inject` 服务面。
+4. `node -e "import('./lib/index.js')"` → host 半可加载，导出 `apply` / `Config` / 设置常量。
+
 ## 0.2.0 适配（2026-09-30）
 
 插件 0.2.0 适配 `@deepseek-ai/*` **0.2.0-rc.2**（DSH Desktop 0.2.0-rc.2）。主要 API 迁移：
@@ -40,8 +59,11 @@
 
 ## 版本策略（Version policy）
 
-- 运行时 `@deepseek-ai/*` 依赖全部声明为 **optional peerDependencies `*`**：宿主 profile
-  提供实际实现，插件不锁定 harness 版本；缺失时宿主按 optional peer 规则跳过。
-- `@deepseek-ai/dsh-*` 未锁定公共 npm 版本，因此 CI 只做**构建门禁**
-  （esbuild + `@deepseek-ai/schemastery`，所有 `@deepseek-ai/dsh-*` 导入保持 external），
-  类型检查在本地 dsh 源码克隆旁侧开发时执行（`pnpm run check`）。
+- 兼容性由包自身 `engines.dsh` 声明（`>=0.2.2-rc.1 <0.3.0-0`）：0.2.2-rc.1 起的宿主按该字段单独判定，
+  不接受 0.2.2 之前的 rc，也不接受 0.3.0 预发布。
+- 运行时 `@deepseek-ai/*` 依赖仍全部声明为 **optional peerDependencies `*`**：宿主 profile 提供实际实现，
+  插件不锁定 harness 版本；缺失时宿主按 optional peer 规则跳过。
+- `devDependencies` 锁定公开发布版 `0.2.2-rc.1`（cordis / schemastery 走各自版本线），因此类型检查与构建
+  不再需要本地 harness 源码克隆。
+- CI 只做**构建门禁**+ **离线冒烟**（esbuild 打包、`scripts/smoke-client.mjs` 复现加载握手并断言注册），
+  所有 `@deepseek-ai/dsh-*` 导入保持 external 由宿主提供。

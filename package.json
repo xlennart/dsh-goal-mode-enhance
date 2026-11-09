@@ -1,11 +1,11 @@
 {
   "name": "dsh-goal-mode",
   "description": "Enhanced goal surface for the DeepSeek Harness web UI: full lifecycle dock above the composer (create / multiline edit / pause / resume / complete / clear with live round progress), a composer tool-row entry with phase dot, a collapsible chip, and a General-settings switch to hide the entry.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KarlOfLaw/dsh-goal-mode-enhance.git"
+    "url": "git+https://github.com/xlennart/dsh-goal-mode-enhance.git"
   },
   "type": "module",
   "main": "lib/index.js",
@@ -32,6 +32,7 @@
         "@deepseek-ai/dsh-client-locale",
         "@deepseek-ai/dsh-client-ui-conversation",
         "@deepseek-ai/dsh-client-ui-renderer",
+        "@deepseek-ai/dsh-client-ui-session",
         "@deepseek-ai/dsh-client-ui-settings"
       ]
     }
@@ -61,36 +62,60 @@
     "react": "^18.2.0"
   },
   "peerDependenciesMeta": {
-    "@deepseek-ai/cordis": { "optional": true },
-    "@deepseek-ai/dsh-client-locale": { "optional": true },
-    "@deepseek-ai/dsh-client-store": { "optional": true },
-    "@deepseek-ai/dsh-client-ui-conversation": { "optional": true },
-    "@deepseek-ai/dsh-client-ui-settings": { "optional": true },
-    "@deepseek-ai/dsh-client-ui-slots": { "optional": true },
-    "@deepseek-ai/dsh-goal": { "optional": true },
-    "@deepseek-ai/schemastery": { "optional": true },
-    "react": { "optional": true }
+    "@deepseek-ai/cordis": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-locale": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-store": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-ui-conversation": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-ui-settings": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-ui-slots": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-goal": {
+      "optional": true
+    },
+    "@deepseek-ai/schemastery": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "dsh": ">=0.2.2-rc.1 <0.3.0-0"
   },
   "devDependencies": {
-    "@deepseek-ai/cordis": "link:../dsh-side-chat/output/upstream/deepseek-harness/vendor/cordis",
-    "@deepseek-ai/schemastery": "link:../dsh-side-chat/output/upstream/deepseek-harness/vendor/schemastery",
-    "@deepseek-ai/dsh-api-remotes": "link:../dsh-side-chat/output/upstream/deepseek-harness/packages/api/remotes",
-    "@deepseek-ai/dsh-api-session-controller": "link:../dsh-side-chat/output/upstream/deepseek-harness/packages/api/session-controller",
-    "@deepseek-ai/dsh-client-locale": "link:../dsh-side-chat/output/upstream/deepseek-harness/packages/client/locale",
-    "@deepseek-ai/dsh-client-store": "link:../dsh-side-chat/output/upstream/deepseek-harness/packages/client/store",
-    "@deepseek-ai/dsh-client-ui-conversation": "link:../dsh-side-chat/output/upstream/deepseek-harness/packages/client/ui-conversation",
-    "@deepseek-ai/dsh-client-ui-renderer": "link:../dsh-side-chat/output/upstream/deepseek-harness/packages/client/ui-renderer",
-    "@deepseek-ai/dsh-client-ui-settings": "link:../dsh-side-chat/output/upstream/deepseek-harness/packages/client/ui-settings",
-    "@deepseek-ai/dsh-client-ui-slots": "link:../dsh-side-chat/output/upstream/deepseek-harness/packages/client/ui-slots",
-    "@deepseek-ai/dsh-goal": "link:../dsh-side-chat/output/upstream/deepseek-harness/packages/goal/goal",
-    "@deepseek-ai/dsh-session": "link:../dsh-side-chat/output/upstream/deepseek-harness/packages/core/session",
-    "@deepseek-ai/dsh-settings": "link:../dsh-side-chat/output/upstream/deepseek-harness/packages/settings/settings",
+    "@deepseek-ai/cordis": "^4.1.0",
+    "@deepseek-ai/dsh-api-remotes": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-api-session-controller": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-client-locale": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-client-store": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-client-ui-conversation": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-client-ui-renderer": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-client-ui-session": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-client-ui-settings": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-client-ui-slots": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-goal": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-session": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-settings": "0.2.2-rc.1",
+    "@deepseek-ai/schemastery": "^3.19.0",
     "@types/node": "^24.0.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "esbuild": "^0.25.0",
+    "immer": "^10.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "zustand": "~4.5.7"
   }
 }
